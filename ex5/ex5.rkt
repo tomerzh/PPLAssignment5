@@ -89,7 +89,11 @@
 ; Purpose: while pred holds return the list elments
 ; Tests: (take-while (integers-from 0) (lambda (x) (< x 9)))==>'(0 1 2 3 4 5 6 7 8)
 ;          (take-while(integers-from 0) (lambda (x)  (= x 128))))==>'()
-(define take-while '...)
+(define take-while
+  (lambda (lzl pred)
+    (cond ((empty-lzl? lzl) lzl)
+          ((pred (head lzl)) (cons (head lzl) (take-while (tail lzl) pred)))
+          (else empty-lzl))))
 
 ;;; Q2.c.2
 ; Signature: take-while-lzl(lz-lst,pred)
@@ -97,14 +101,20 @@
 ; Purpose: while pred holds return list elments as a lazy list
 ; Tests: (take (take-while-lzl (integers-from 0) (lambda (x) (< x 9))) 10) ==>'(0 1 2 3 4 5 6 7 8)
 ;           (take-while-lzl(integers-from 0) (lambda (x)  (= x 128))))==>'()
-(define take-while-lzl '...)
+(define take-while-lzl
+  (lambda (lzl pred)
+    (cond ((empty-lzl? lzl) lzl)
+          ((pred (head lzl)) (cons (head lzl) (lambda () (take-while-lzl (tail lzl) pred))))
+          (else empty-lzl))))
+                             
 
 
 ;;; Q2.d
 ; Signature: reduce-lzl(reducer, init, lzl)
 ; Type: @TODO
 ; Purpose: Returns the reduced value of the given lazy list
-(define reduce-lzl '...)
-
-
-
+(define reduce-lzl
+  (lambda (binary-func init lzl)
+    (if (empty-lzl? lzl)
+         init
+        (reduce-lzl binary-func (binary-func init (head lzl)) (tail lzl)))))
