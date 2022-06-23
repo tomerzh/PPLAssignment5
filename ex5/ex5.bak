@@ -22,13 +22,6 @@
     (lambda (x)
        (g (f x)))))
 
-(define compose$
-  (lambda (f$ g$ cont)
-    (cont (lambda (x compose-cont)
-      (f$ x (lambda (res-f)
-              (g$ res-f (lambda (res-g)
-                          (compose-cont res-g)))))))))
-
 
 ; Signature: pipe(lst-fun)
 ; Type: [[T1 -> T2],[T2 -> T3]...[Tn-1 -> Tn]]  -> [T1->Tn]
@@ -52,12 +45,7 @@
 ;       [T2n+1 * [T2n+2 -> T2n+3]] -> T2n+3
 ;      -> [T1 * [T2n+3 -> T2n+4]] -> T2n+4
 ; Purpose: Returns the composition of a given list of unry CPS functions. 
-(define pipe$
-  (lambda (fs$ cont)
-    (if (empty? (cdr fs$))
-        (cont (car fs$))
-        (pipe$ (cdr fs$) (lambda (res-pipe)
-               (compose$ (car fs$) res-pipe cont))))))
+(define pipe$  '...)
 
 
 ;;; Q1.c
