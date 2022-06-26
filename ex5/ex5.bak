@@ -22,6 +22,13 @@
     (lambda (x)
        (g (f x)))))
 
+(define compose$
+  (lambda (f$ g$ cont)
+    (cont (lambda (x compose-cont)
+      (f$ x (lambda (res-f)
+              (g$ res-f (lambda (res-g)
+                          (compose-cont res-g)))))))))
+
 
 ; Signature: pipe(lst-fun)
 ; Type: [[T1 -> T2],[T2 -> T3]...[Tn-1 -> Tn]]  -> [T1->Tn]
@@ -45,7 +52,12 @@
 ;       [T2n+1 * [T2n+2 -> T2n+3]] -> T2n+3
 ;      -> [T1 * [T2n+3 -> T2n+4]] -> T2n+4
 ; Purpose: Returns the composition of a given list of unry CPS functions. 
-(define pipe$  '...)
+(define pipe$
+  (lambda (fs$ cont)
+    (if (empty? (cdr fs$))
+        (cont (car fs$))
+        (pipe$ (cdr fs$) (lambda (res-pipe)
+               (compose$ (car fs$) res-pipe cont))))))
 
 
 ;;; Q1.c
@@ -77,7 +89,11 @@
 ; Purpose: while pred holds return the list elments
 ; Tests: (take-while (integers-from 0) (lambda (x) (< x 9)))==>'(0 1 2 3 4 5 6 7 8)
 ;          (take-while(integers-from 0) (lambda (x)  (= x 128))))==>'()
-(define take-while '...)
+(define take-while
+  (lambda (lzl pred)
+    (cond ((empty-lzl? lzl) lzl)
+          ((pred (head lzl)) (cons (head lzl) (take-while (tail lzl) pred)))
+          (else empty-lzl))))
 
 ;;; Q2.c.2
 ; Signature: take-while-lzl(lz-lst,pred)
@@ -85,14 +101,20 @@
 ; Purpose: while pred holds return list elments as a lazy list
 ; Tests: (take (take-while-lzl (integers-from 0) (lambda (x) (< x 9))) 10) ==>'(0 1 2 3 4 5 6 7 8)
 ;           (take-while-lzl(integers-from 0) (lambda (x)  (= x 128))))==>'()
-(define take-while-lzl '...)
+(define take-while-lzl
+  (lambda (lzl pred)
+    (cond ((empty-lzl? lzl) lzl)
+          ((pred (head lzl)) (cons (head lzl) (lambda () (take-while-lzl (tail lzl) pred))))
+          (else empty-lzl))))
+                             
 
 
 ;;; Q2.d
 ; Signature: reduce-lzl(reducer, init, lzl)
 ; Type: @TODO
 ; Purpose: Returns the reduced value of the given lazy list
-(define reduce-lzl '...)
-
-
-
+(define reduce-lzl
+  (lambda (binary-func init lzl)
+    (if (empty-lzl? lzl)
+         init
+        (reduce-lzl binary-func (binary-func init (head lzl)) (tail lzl)))))

@@ -71,7 +71,12 @@
 ;      (reduce-prim$ * 1 '(1 2 3 4 5) (lambda (x) x)) ==> 120
 ;      (reduce-prim$ - 1 '(1 2 3 4 5) (lambda (x) x))==> -14
 
-(define reduce-prim$ '...)
+(define reduce-prim$
+  (lambda (primOp init list cont)
+    (if (empty? list)
+        (cont init)
+        (reduce-prim$ primOp init (cdr list) (lambda (res) (cont (primOp res (car list))))))))
+    
 
 ; Signature: reduce-user$(reducer, init, lst, cont)
 ; Type: @TODO
@@ -81,7 +86,11 @@
 ; test: (reduce-user$ plus$ 0 '(3 8 2 2) (lambda (x) x)) ==> 15
 ;        (reduce-user$ div$ 100 '(5 4 1) (lambda (x) (* x 2))) ==> -14
 
-(define reduce-user$ '...)
+(define reduce-user$
+  (lambda (prim$ init list cont)
+    (if (empty? list)
+        (cont init)
+        (reduce-user$ prim$ init (cdr list) (lambda (res) (prim$ res (car list) cont))))))
 
 ;;; Q2.c.1
 ; Signature: take1(lz-lst,pred)
